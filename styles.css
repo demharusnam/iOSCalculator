@@ -1,0 +1,18 @@
+body {
+	background-color: #222222;
+}
+
+.main {
+	margin: 50px auto;
+	/*padding: 10px auto;*/
+	display: block;	
+	background-color: #e3910e;
+	width: 50%;
+	height: auto;
+}
+
+.grid {
+	height: 50px;
+	width: 50px;
+	background-color: Red;
+}
