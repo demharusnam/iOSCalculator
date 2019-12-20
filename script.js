@@ -46,35 +46,59 @@ const initUI = () => createGrid(rows); createAnswerDisplay();
 
 const updateDisplayText = (str) => {
 	displayTextUI = document.querySelector('.disp');
+	const lastPos = displayText.length-1;
 	switch (str) {
 		case 'clear':
 			displayText = "0";
 			break;
 		case 'backspace':
-			displayText = displayText.slice(0, -1);
+			// regex pattern handle deletion of numbers with/without brackets and negative signs
+			// [^()]+(?=\)[^()]*$) excludes brackets (UNUSED)
+			displayText = (displayText.charAt(lastPos) == ")") 
+			?  displayText.replace(/\((?=[^\(]*$)(.*)/, (match) => {
+				return match.length > 3
+				? match.slice(0,-2) + ')'
+				: match.length == displayText.length
+				? "0"
+				: ""
+				})
+			: displayText.slice(0, -1);
 			break;
 		case 'int':
 			// regex pattern to prevent operators from affected by int operator
-			displayText = displayText.replace(/-?\d+\.?\d*$/, (match) => (match === '0') 
+			displayText = displayText.replace(/\(?-?\d+\.?\d*\)?$/, (match) => { 
+				return (match === '0') 
 				? '0' 
-				: (match == ')') 
-				? displayText.replace(/\(?-?\d+\.?\d*\)?$/, (matchh) => matchh.splice(1,-1)) 
-				: `(${match*-1})`);
+				: (match.charAt(match.length-1) == ')') 
+				? match.slice(2,-1)
+				: `(${match*-1})`;
+			});
 			break;
 		case 'add': case 'sub': case 'mul': case 'div':
 			// regex pattern to prevent chaining of multiple operators without any values to operate on
-			displayText = displayText.replace(/\/?\*?\+?\-?$/, (match) => (match.length > 1) ? match.splice(0,1) : rows[str]);
+			displayText = displayText.replace(/\/?\*?\+?\-?$/, (match) => rows[str]);
 			break;//\(?-?\d+\.?\d*\)?$
 		case 'dec':
 			// regex pattern to prevent decimal being added after operators
-			displayText = displayText.replace(/-?\d+\.?\d*$/, (match) => `${match}.`);
+			console.log(displayText.match(/[(^0-9\.)]+(?=\.[^.]*$)/))
+			displayText = displayText.match(/\.(?=[\.]*$)/) === null && displayText.match(/[(^0-9\.)]+(?=\.[^.]*$)/) === null
+			? displayText + rows[str]
+			: (displayText.match(/[(^0-9\.)]+(?=[^.]*$)$/)[0].match(/\./g) == null) || (displayText.match(/[(^0-9\.)]+(?=[^.]*$)$/)[0].match(/\./g).length > 1)
+			? displayText
+			: displayText.match(/\.(?=[\.]*$)(.*)/) == null || displayText.match(/\.(?=[\.]*$)(.*)/).length > 1 // prevents consecutive decimals from being used
+			? displayText
+			: (displayText.charAt(lastPos) == ")") 
+			? displayText.substring(0, lastPos) + rows[str] + displayText.substring(lastPos)  
+			: displayText.replace(/-?\d+\.?\d*$/, (match) => `${match}.`);
 			break;
 		case 'eq':
 
 			break;
 		default:
 			displayText = (displayText === "0") ? "" : displayText;
-			displayText += rows[str];
+			(displayText.charAt(lastPos) == ")") 
+			? displayText = displayText.substring(0, lastPos) + rows[str] + displayText.substring(lastPos)  
+			: displayText += rows[str];
 			break;
 	}
 	displayTextUI.textContent = displayText;
@@ -136,7 +160,8 @@ buttons.forEach((button) => {
 	});
 });
 
-
+//let strr = "...234234.234234....+";
+//console.log(strr.match(/[(^0-9\.)]+(?=\.[^.]*$)/)[0].match(/\./g).length);
 
 
 
