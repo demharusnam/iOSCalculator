@@ -76,23 +76,20 @@ const updateDisplayText = (str) => {
 			break;
 		case 'add': case 'sub': case 'mul': case 'div':
 			// regex pattern to prevent chaining of multiple operators without any values to operate on
-			displayText = displayText.replace(/\/?\*?\+?\-?$/, (match) => rows[str]);
+			displayText = displayText.match(/\.$/) === null
+			? displayText.replace(/\/?\*?\+?\-?$/, (match) => rows[str])
+			: displayText;
 			break;//\(?-?\d+\.?\d*\)?$
 		case 'dec':
-			// regex pattern to prevent decimal being added after operators
-			console.log(displayText.match(/[(^0-9\.)]+(?=\.[^.]*$)/))
-			displayText = displayText.match(/\.(?=[\.]*$)/) === null && displayText.match(/[(^0-9\.)]+(?=\.[^.]*$)/) === null
-			? displayText + rows[str]
-			: (displayText.match(/[(^0-9\.)]+(?=[^.]*$)$/)[0].match(/\./g) == null) || (displayText.match(/[(^0-9\.)]+(?=[^.]*$)$/)[0].match(/\./g).length > 1)
+			// regex pattern to prevent decimal being added after operators/consecutive decimals/multiple decimals in one number
+			displayText = (displayText.match(/[(^0-9\.)]+(?=[^.0-9\+\-\/\*]*$)/) === null) || (displayText.match(/[(^0-9\.)]+(?=[^.0-9\+\-\/\*]*$)/)[0].match(/\./g) !== null)
 			? displayText
-			: displayText.match(/\.(?=[\.]*$)(.*)/) == null || displayText.match(/\.(?=[\.]*$)(.*)/).length > 1 // prevents consecutive decimals from being used
-			? displayText
-			: (displayText.charAt(lastPos) == ")") 
-			? displayText.substring(0, lastPos) + rows[str] + displayText.substring(lastPos)  
-			: displayText.replace(/-?\d+\.?\d*$/, (match) => `${match}.`);
+			: displayText + rows[str];
 			break;
 		case 'eq':
-
+			displayText.match(/[\.\+\-\*\/]$/) != null
+			? alert(`Error. Cannot end expression with "${displayText.match(/[\.\+\-\*\/]$/)[0]}"!`)
+			: null
 			break;
 		default:
 			displayText = (displayText === "0") ? "" : displayText;
@@ -161,7 +158,7 @@ buttons.forEach((button) => {
 });
 
 //let strr = "...234234.234234....+";
-//console.log(strr.match(/[(^0-9\.)]+(?=\.[^.]*$)/)[0].match(/\./g).length);
+//console.log(strr.match(/[(^0-9\.)]+(?=[^.]*$)/)[0].match(/\./g).length);
 
 
 
