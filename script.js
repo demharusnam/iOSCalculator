@@ -62,15 +62,21 @@ const updateDisplayText = (str) => {
 				? "0"
 				: ""
 				})
+			: displayText === '0'
+			? displayText
+			: displayText.length === 1 
+			? "0"
 			: displayText.slice(0, -1);
 			break;
 		case 'int':
 			// regex pattern to prevent operators from affected by int operator
-			displayText = displayText.replace(/\(?-?\d+\.?\d*\)?$/, (match) => { 
-				return (match === '0') 
+			displayText = displayText.replace(/(\(\-[0-9.]*\))$|([0-9.]*)$/, (match) => { 
+				return (match == '0') 
 				? '0' 
 				: (match.charAt(match.length-1) == ')') 
 				? match.slice(2,-1)
+				: (match == "")
+				? ""
 				: `(${match*-1})`;
 			});
 			break;
@@ -90,7 +96,7 @@ const updateDisplayText = (str) => {
 			displayText.match(/[\.\+\-\*\/]$/) !== null // checks if calculation ends in decimal or operator
 			? alert(`Error. Cannot end expression with "${displayText.match(/[\.\+\-\*\/]$/)[0]}"!`)
 			: displayText.match(/[\-\+\*\/]/g) !== null // checks if calculation contains any operators at all
-			? compute()
+			? displayText = compute()
 			: null;
 			break;
 		default:
@@ -106,6 +112,9 @@ const updateDisplayText = (str) => {
 
 // update the label for the clear button (AC/C)
 const updateClear = () => document.querySelector("#clear").textContent = (displayText === "0") ? 'AC' : 'C'; 
+
+// converts integer string into number
+const stringToNumber = (str) => str.charAt(str.length-1) == ')' ? Number(str.slice(1,-1)) : Number(str);
 	
 // MARK - Computations
 const add 		= (x, y) => x + y;
@@ -113,32 +122,50 @@ const subtract 	= (x, y) => x - y;
 const multiply 	= (x, y) => x*y;
 const divide 	= (x, y) => x/y;
 
-const operate = (op, x, y = 0, str = "") => {
+const operate = (op, strX, strY) => {
+	const x = stringToNumber(strX), y = stringToNumber(strY);
 	switch (op) {
 		case '+':
-			return add(x, y);
+			return `${add(x, y)}`;
 		case '-':
-			return subtract(x, y); 
+			return `${subtract(x, y)}`; 
 		case '*':
-			return multiply(x, y); 
+			return `${multiply(x, y)}`; 
 		case '/':
-			return divide(x, y); 
-		default:
-			return null;
+			return `${divide(x, y)}`; 
 	}
 }
 
 const compute = () => {
-	let computing = displayText.match(/([0-9\.]+)|([\+\/\-\*])|(\(-[0-9\.]*\))/g), 
-		computed;
+	let computing = displayText.match(/([0-9\.]+)|([\+\/\-\*])|(\(-[0-9\.]*\))/g);
 	console.log(computing);
-	/*const operatorCount = displayText.match(/[\-\+\*\/]/g).length;
+	const operatorCount = displayText.match(/[\-\+\*\/]/g).length;
 	for(let i = 0; i < operatorCount; i++) {
-		
-	}*/
+		const x = computing[0], op1 = computing[1], y = computing[2];
+		if (operatorCount - i >= 2) {
+			const op2 = computing[3], z = computing[4];
+			switch (op1) {
+				case "+": case "-":
+					if (op2 === '*' || op2 === '/') {
+						computing[2] = operate(op2, y, z);
+						computing.splice(3,2);
+					} else {
+						computing[0] = operate(op1, x, y);
+						computing.splice(1,2);
+					}
+					break;
+				case '*': case '/':
+					computing[0] = operate(op1, x, y);
+					computing.splice(1,2);
+					break;
+			}
+		} else {
+			computing[0] = operate(op1, x, y);
+			computing.splice(1,2);
+		}
+	}
+	return computing[0];
 }
-
-//const checkForNegative
 
 // main
 initUI();
@@ -150,11 +177,6 @@ buttons.forEach((button) => {
 		updateDisplayText(button.id);
 	});
 });
-
-//let strr = "10.11+11.3-89987+(-12.32)-(-123.3234235)*(-123123.45645)";
-//console.log(strr.match(/([0-9\.]+)|([\+\/\-\*])|(\(-[0-9\.]*\))/g));
-
-compute();
 
 
 
