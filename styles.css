@@ -35,6 +35,8 @@ body {
 	height: 15%;
 	word-wrap: wrap;
 	overflow-x: scroll;
+	overflow-y: clip;
+	word-break: keep-all;
 }
 
 .disp::-webkit-scrollbar {
@@ -44,6 +46,10 @@ body {
 .disp::-webkit-scrollbar-thumb {
   	background-color: #2f2f2f;
   	border-radius: 1vmax;
+}
+
+.disp::-webkit-scrollbar-corner {
+	background-color: #222222;
 }
 
 .grid {
