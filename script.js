@@ -138,7 +138,7 @@ const operate = (op, strX, strY) => {
 
 const compute = () => {
 	let computing = displayText.match(/([0-9\.]+)|([\+\/\-\*])|(\(-[0-9\.]*\))/g);
-	console.log(computing);
+	//console.log(computing);
 	const operatorCount = displayText.match(/[\-\+\*\/]/g).length;
 	for(let i = 0; i < operatorCount; i++) {
 		const x = computing[0], op1 = computing[1], y = computing[2];
@@ -167,6 +167,11 @@ const compute = () => {
 	return computing[0];
 }
 
+// checks if value exists in dict
+const isKeyValid = (value) => Object.values(rows).includes(value);
+// retrieves key from value in dict
+const getKeyFromValue = (value) => Object.keys(rows).find(key => rows[key] === value);
+
 // main
 initUI();
 
@@ -177,6 +182,26 @@ buttons.forEach((button) => {
 		updateDisplayText(button.id);
 	});
 });
+
+document.addEventListener("keydown", (event) => {
+	switch (event.key) {
+		case 'Backspace':
+			updateDisplayText('backspace');
+			break;
+		case 'c': case 'C':
+			updateDisplayText('clear');
+			break;
+		case '_':
+			updateDisplayText('int');
+			break;
+		case 'Enter':
+			updateDisplayText('eq');
+		default:
+			isKeyValid(event.key) ? updateDisplayText(getKeyFromValue(event.key)) : null
+			break;
+	}
+});
+
 
 
 
