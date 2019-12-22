@@ -87,9 +87,11 @@ const updateDisplayText = (str) => {
 			: displayText + rows[str];
 			break;
 		case 'eq':
-			displayText.match(/[\.\+\-\*\/]$/) != null
+			displayText.match(/[\.\+\-\*\/]$/) !== null // checks if calculation ends in decimal or operator
 			? alert(`Error. Cannot end expression with "${displayText.match(/[\.\+\-\*\/]$/)[0]}"!`)
-			: null
+			: displayText.match(/[\-\+\*\/]/g) !== null // checks if calculation contains any operators at all
+			? compute()
+			: null;
 			break;
 		default:
 			displayText = (displayText === "0") ? "" : displayText;
@@ -127,21 +129,13 @@ const operate = (op, x, y = 0, str = "") => {
 }
 
 const compute = () => {
-	let computed;
-	let x, y;
-	const operatorCount = displayText.match(/([\+\-\/\*])(?![^\-]*\))/).length;
-	for(let i = 0; i < operatorCount; i++){
-		if((/[\*\/]*?/).test(displayText)) {
-			const iMul = displayText.search("*");
-			const iDiv = displayText.search("/");
-			if (iMul < iDiv && iMul != -1) {
-				if(displayText[iMul-1] == ')') {
-					x = displayText.splice(iMul-3,iMul-2);
-				} else x = displayText[iMul-1];
-				//if(displayText[iMul+1])
-			}
-		}
-	}
+	let computing = displayText.match(/([0-9\.]+)|([\+\/\-\*])|(\(-[0-9\.]*\))/g), 
+		computed;
+	console.log(computing);
+	/*const operatorCount = displayText.match(/[\-\+\*\/]/g).length;
+	for(let i = 0; i < operatorCount; i++) {
+		
+	}*/
 }
 
 //const checkForNegative
@@ -157,9 +151,10 @@ buttons.forEach((button) => {
 	});
 });
 
-//let strr = "...234234.234234....+";
-//console.log(strr.match(/[(^0-9\.)]+(?=[^.]*$)/)[0].match(/\./g).length);
+//let strr = "10.11+11.3-89987+(-12.32)-(-123.3234235)*(-123123.45645)";
+//console.log(strr.match(/([0-9\.]+)|([\+\/\-\*])|(\(-[0-9\.]*\))/g));
 
+compute();
 
 
 
