@@ -32,11 +32,12 @@ body {
 	margin: auto 0.35em;
 	color: #f2f2f2;
 	width: 30vmax;
-	height: 15%;
+	height: 17%;
 	word-wrap: wrap;
 	overflow-x: scroll;
 	overflow-y: clip;
 	word-break: keep-all;
+	scrollbar-color: #2f2f2f #222222;
 }
 
 .disp::-webkit-scrollbar {
