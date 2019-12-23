@@ -137,9 +137,11 @@ const operate = (op, strX, strY) => {
 }
 
 const compute = () => {
+	// retrieves all numbers and operator signs as separate entitities, creating a calculation queue
 	let computing = displayText.match(/([0-9\.]+)|([\+\/\-\*])|(\(-[0-9\.]*\))/g);
-	//console.log(computing);
-	const operatorCount = displayText.match(/[\-\+\*\/]/g).length;
+	// retrieves operator count from display text (excluding integers)
+	const operatorCount = displayText.match(/[\-\+\/\*](?![\d\.]*[\)])/g).length;
+	console.log(operatorCount);
 	for(let i = 0; i < operatorCount; i++) {
 		const x = computing[0], op1 = computing[1], y = computing[2];
 		if (operatorCount - i >= 2) {
