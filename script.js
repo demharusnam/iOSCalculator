@@ -141,7 +141,7 @@ const compute = () => {
 	let computing = displayText.match(/([0-9\.]+)|([\+\/\-\*])|(\(-[0-9\.]*\))/g);
 	// retrieves operator count from display text (excluding integers)
 	const operatorCount = displayText.match(/[\-\+\/\*](?![\d\.]*[\)])/g).length;
-	console.log(operatorCount);
+	console.log(displayText);
 	for(let i = 0; i < operatorCount; i++) {
 		const x = computing[0], op1 = computing[1], y = computing[2];
 		if (operatorCount - i >= 2) {
@@ -166,7 +166,10 @@ const compute = () => {
 			computing.splice(1,2);
 		}
 	}
-	return computing[0];
+	// if final answer is negative, adjust appearance before returning
+	return computing[0].charAt(0) == "-"
+	? "(-" + computing[0].match(/[\d\.]+/)[0] + ")"
+	: computing[0];
 }
 
 // checks if value exists in dict
